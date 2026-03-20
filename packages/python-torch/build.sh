@@ -35,7 +35,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_ITT=OFF
 -DUSE_MAGMA=OFF
 -DUSE_NCCL=OFF
--DUSE_NNPACK=OFF
+-DUSE_NNPACK=ON
 -DCXX_AVX512_FOUND=OFF
 -DCXX_AVX2_FOUND=OFF
 -DUSE_VULKAN=ON
@@ -62,10 +62,10 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -fopenmp -static-openmp"
 
 	export PYTHONPATH="${PYTHONPATH}:${TERMUX_PKG_SRCDIR}"
-	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt -o -name '*.cmake' ! -name 'VulkanCodegen*' | \
+	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt -o -name '*.cmake' ! -name 'VulkanCodegen*' |
 		xargs -n 1 sed -i \
-		-e 's/\([^A-Za-z0-9_]ANDROID\)\([^A-Za-z0-9_]\)/\1_NO_TERMUX\2/g' \
-		-e 's/\([^A-Za-z0-9_]ANDROID\)$/\1_NO_TERMUX/g'
+			-e 's/\([^A-Za-z0-9_]ANDROID\)\([^A-Za-z0-9_]\)/\1_NO_TERMUX\2/g' \
+			-e 's/\([^A-Za-z0-9_]ANDROID\)$/\1_NO_TERMUX/g'
 
 	termux_setup_protobuf
 

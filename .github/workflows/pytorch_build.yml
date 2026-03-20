@@ -1,0 +1,32 @@
+name: Build PyTorch for Termux
+
+on:
+  workflow_dispatch: # Permite rodar manualmente pelo painel do GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build PyTorch inside Termux Docker
+        run: |
+          # 1. Baixa o script auxiliar de build do repositório oficial
+          git clone --depth 1 https://github.com/termux/termux-packages.git
+
+          # 2. Move seu script customizado para a pasta do pacote
+          # Assumindo que seu build.sh está na raiz do seu repo
+          mkdir -p termux-packages/packages/python-torch
+          cp build.sh termux-packages/packages/python-torch/build.sh
+
+          # 3. Executa o build usando o container oficial (Docker)
+          # O parâmetro -a aarch64 foca no seu Snapdragon 8 Gen 1
+          cd termux-packages
+          ./start-builder.sh ./build-package.sh -a aarch64 python-torch
+
+      - name: Upload DEB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytorch-termux-deb
+          path: termux-packages/output/*.deb
